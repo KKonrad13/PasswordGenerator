@@ -8,6 +8,11 @@ public class Generator {
     private final char[] uppercaseLetters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
     private final char[] specialSigns = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', '`', '~', '[', ']', '{', '}', '|', '\\', ';', ':', '\'', '"', ',', '<', '.', '>', '/', '?'};
 
+    private final int NUMBERS_LENGTH = numbers.length;
+    private final int LOWERCASE_LETTERS_LENGTH = numbers.length;
+    private final int UPPERCASE_LETTERS_LENGTH = numbers.length;
+    private final int SPECIAL_SIGNS_LENGTH = numbers.length;
+
     private int length;
     private boolean withNumbers;
     private boolean withLowercaseLetters;
@@ -25,6 +30,17 @@ public class Generator {
         this.withSpecialSigns = withSpecialSigns;
         this.onlyUniqueCharacters = onlyUniqueCharacters;
         this.random = new Random();
+    }
+
+    public int calculateMaximumLength(){
+        int maxLength = 0;
+
+        if(withNumbers) maxLength += NUMBERS_LENGTH;
+        if(withLowercaseLetters) maxLength += LOWERCASE_LETTERS_LENGTH;
+        if(withUppercaseLetters) maxLength += UPPERCASE_LETTERS_LENGTH;
+        if(withSpecialSigns) maxLength += SPECIAL_SIGNS_LENGTH;
+
+        return maxLength;
     }
 
     public String generatePassword(){
@@ -105,53 +121,29 @@ public class Generator {
     private char randomSpecialSign(){
         return specialSigns[random.nextInt(specialSigns.length)];
     }
+
     private char randomNumber(){
         return numbers[random.nextInt(numbers.length)];
-    }
-
-
-    public int getLength() {
-        return length;
     }
 
     public void setLength(int length) {
         this.length = length;
     }
 
-    public boolean isWithNumbers() {
-        return withNumbers;
-    }
-
     public void setWithNumbers(boolean withNumbers) {
         this.withNumbers = withNumbers;
-    }
-
-    public boolean isWithLowercaseLetters() {
-        return withLowercaseLetters;
     }
 
     public void setWithLowercaseLetters(boolean withLowercaseLetters) {
         this.withLowercaseLetters = withLowercaseLetters;
     }
 
-    public boolean isWithUppercaseLetters() {
-        return withUppercaseLetters;
-    }
-
     public void setWithUppercaseLetters(boolean withUppercaseLetters) {
         this.withUppercaseLetters = withUppercaseLetters;
     }
 
-    public boolean isWithSpecialSigns() {
-        return withSpecialSigns;
-    }
-
     public void setWithSpecialSigns(boolean withSpecialSigns) {
         this.withSpecialSigns = withSpecialSigns;
-    }
-
-    public boolean isOnlyUniqueCharacters() {
-        return onlyUniqueCharacters;
     }
 
     public void setOnlyUniqueCharacters(boolean onlyUniqueCharacters) {

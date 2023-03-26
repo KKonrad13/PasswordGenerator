@@ -2,35 +2,51 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Main extends JFrame implements ActionListener {
+public class GUI extends JFrame implements ActionListener {
 
-    // Declare GUI components
+
     private JCheckBox numbersCheckBox, lowerLettersCheckBox, upperLettersCheckBox, specialSignsCheckBox, uniqueCharacters;
-    private JLabel lengthLabel, resultTextLabel, resultLabel;
+    private JLabel lengthLabel, resultTextLabel, resultLabel, errorLabel;
     private JTextField lengthTextField;
     private JButton generateButton;
-    private Generator gen = new Generator(30, true, true, true, true, true);
-    private void gui(){
-        // Set up JFrame
+    private Generator gen;
+    private GridBagConstraints constraints;
+    private final Font font;
+    public GUI(){
+        gen = new Generator(30, true, true, true, true, true);
+        font = new Font("Arial", Font.PLAIN, 20);
+    }
+
+    private void setUpGUI(){
         setTitle("Password Generator");
         setSize(500, 300);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-// Set up layout with 6 rows and 2 columns
+        setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+        constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;
 
-        constraints.insets = new Insets(0, 10, 0, 0); // Add left margin of 10dp
+        constraints.insets = new Insets(0, 20, 0, 20); // Add left margin of 10dp
 
         GridBagLayout layout = (GridBagLayout) getContentPane().getLayout();
         layout.columnWeights = new double[]{1.0, 2.0};
 
-// Create and add components
+        setUpCheckboxes();
+        setUpTextField();
+        setUpLabels();
+        setUpButton();
+
+        setFonts();
+        setUpListeners();
+
+        setVisible(true);
+    }
+
+    private void setUpCheckboxes(){
         constraints.gridx = 0; // Starting column index
         constraints.gridy = 0; // Row index
-        constraints.gridwidth = 2; // Number of columns to span
-        constraints.anchor = GridBagConstraints.WEST; // Checkbox alignment
+        constraints.gridwidth = 2; // checkboxes will take 2 columns
+        constraints.anchor = GridBagConstraints.WEST; // alignment
         numbersCheckBox = new JCheckBox("Numbers");
         numbersCheckBox.setSelected(true);
         add(numbersCheckBox, constraints);
@@ -54,19 +70,25 @@ public class Main extends JFrame implements ActionListener {
         uniqueCharacters = new JCheckBox("Only Unique Characters");
         uniqueCharacters.setSelected(true);
         add(uniqueCharacters, constraints);
+    }
 
+    private void setUpTextField(){
         constraints.gridy = 5;
-        constraints.gridwidth = 1; // Reset number of columns to 1
+        constraints.gridwidth = 1;
+        constraints.gridx = 1; // second column
+        lengthTextField = new JTextField();
+
+        add(lengthTextField, constraints);
+    }
+
+    private void setUpLabels(){
+        constraints.gridy = 5;
+        constraints.gridx = 0;
         lengthLabel = new JLabel("Length: ");
         add(lengthLabel, constraints);
 
-        constraints.gridx = 1; // Move to next column
-        lengthTextField = new JTextField();
-        add(lengthTextField, constraints);
-
         constraints.gridy = 6;
         constraints.gridx = 0; // Move back to first column
-        constraints.gridwidth = 1; // Reset number of columns to 1
         resultTextLabel = new JLabel("Password: ");
         add(resultTextLabel, constraints);
 
@@ -74,28 +96,34 @@ public class Main extends JFrame implements ActionListener {
         resultLabel = new JLabel();
         add(resultLabel, constraints);
 
+        constraints.gridy = 8;
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        errorLabel = new JLabel();
+        errorLabel.setForeground(Color.RED);
+        add(errorLabel, constraints);
+    }
+
+    private void setUpButton(){
         constraints.gridy = 7;
         constraints.gridx = 0;
         constraints.gridwidth = 2;
         generateButton = new JButton("Generate");
         add(generateButton, constraints);
 
-        setFonts();
-        setUpListeners();
-
-        System.out.println(gen.generatePassword());
     }
 
     private void setFonts(){
-        lengthLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-        resultLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-        resultTextLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+        lengthLabel.setFont(font);
+        resultLabel.setFont(font);
+        resultTextLabel.setFont(font);
+        errorLabel.setFont(font);
 
-        numbersCheckBox.setFont(new Font("Arial", Font.PLAIN, 20));
-        lowerLettersCheckBox.setFont(new Font("Arial", Font.PLAIN, 20));
-        upperLettersCheckBox.setFont(new Font("Arial", Font.PLAIN, 20));
-        specialSignsCheckBox.setFont(new Font("Arial", Font.PLAIN, 20));
-        uniqueCharacters.setFont(new Font("Arial", Font.PLAIN, 20));
+        numbersCheckBox.setFont(font);
+        lowerLettersCheckBox.setFont(font);
+        upperLettersCheckBox.setFont(font);
+        specialSignsCheckBox.setFont(font);
+        uniqueCharacters.setFont(font);
     }
 
     private void setUpListeners(){
@@ -119,13 +147,28 @@ public class Main extends JFrame implements ActionListener {
         } else if (e.getSource() == uniqueCharacters) {
             gen.setOnlyUniqueCharacters(uniqueCharacters.isSelected());
         } else if (e.getSource() == generateButton) {
-            resultLabel.setText(gen.generatePassword());
+            try{
+                int length = Integer.parseInt(lengthTextField.getText());
+                if(uniqueCharacters.isSelected() && length > gen.calculateMaximumLength()){
+                    errorLabel.setText("Too big length for these parameters!");
+                    resultLabel.setText("");
+                }else if(length <= 0){
+                    errorLabel.setText("Length must be positive!");
+                    resultLabel.setText("");
+                }else{
+                    gen.setLength(length);
+                    resultLabel.setText(gen.generatePassword());
+                    errorLabel.setText("");
+                }
+            }catch (NumberFormatException exception){
+                errorLabel.setText("Length must be a number!");
+                resultLabel.setText("");
+            }
         }
     }
 
     public static void main(String[] args) {
-        Main m = new Main();
-        m.gui();
-        m.setVisible(true);
+        GUI gui = new GUI();
+        gui.setUpGUI();
     }
 }
