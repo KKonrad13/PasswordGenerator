@@ -155,6 +155,9 @@ public class GUI extends JFrame implements ActionListener {
                 }else if(length <= 0){
                     errorLabel.setText("Length must be positive!");
                     resultLabel.setText("");
+                }else if(length > 94){
+                    errorLabel.setText("Try smaller length");
+                    resultLabel.setText("");
                 }else{
                     gen.setLength(length);
                     resultLabel.setText(gen.generatePassword());
